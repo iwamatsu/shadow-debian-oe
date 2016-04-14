@@ -34,6 +34,9 @@
 
 #ident "$Id$"
 
+/* Disable use of syslog since we're running this command against a sysroot */
+#undef USE_SYSLOG
+
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>

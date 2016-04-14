@@ -32,6 +32,9 @@
 
 #include <config.h>
 
+/* Disable use of syslog since we're running this command against a sysroot */
+#undef USE_SYSLOG
+
 #include <fcntl.h>
 #include <getopt.h>
 #include <grp.h>
