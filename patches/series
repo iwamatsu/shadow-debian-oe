@@ -1,0 +1,3 @@
+shadow-4.1.3-dots-in-usernames.patch -p1
+0001-useradd-copy-extended-attributes-of-home.patch -p1
+0001-Disable-use-of-syslog-for-sysroot.patch -p1
