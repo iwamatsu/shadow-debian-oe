@@ -1,0 +1,6 @@
+ignore: shadow-4.1.3-dots-in-usernames.patch
+already applied 0001-useradd-copy-extended-attributes-of-home.patch
+apply: 0001-Disable-use-of-syslog-for-sysroot.patch \
+apply: allow-for-setting-password-in-clear-text.patch \
+apply: commonio.c-fix-unexpected-open-failure-in-chroot-env.patch \
+apply: 0001-useradd.c-create-parent-directories-when-necessary.patch
