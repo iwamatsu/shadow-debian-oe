@@ -54,6 +54,9 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef WITH_ATTR
+#include <attr/libattr.h>
+#endif
 #include "chkname.h"
 #include "defines.h"
 #include "faillog.h"
@@ -1968,6 +1971,9 @@ static void create_home (void)
 		chown (user_home, user_id, user_gid);
 		chmod (user_home,
 		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
+#ifdef WITH_ATTR
+	               attr_copy_file (def_template, user_home, NULL, NULL);
+#endif
 		home_added = true;
 #ifdef WITH_AUDIT
 		audit_logger (AUDIT_ADD_USER, Prog,
