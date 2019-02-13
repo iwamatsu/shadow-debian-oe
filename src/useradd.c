@@ -779,8 +779,10 @@ static void usage (int status)
 	(void) fputs (_("  -o, --non-unique              allow to create users with duplicate\n"
 	                "                                (non-unique) UID\n"), usageout);
 	(void) fputs (_("  -p, --password PASSWORD       encrypted password of the new account\n"), usageout);
+	(void) fputs (_("  -P, --clear-password PASSWORD clear password of the new account\n"), usageout);
 	(void) fputs (_("  -r, --system                  create a system account\n"), usageout);
 	(void) fputs (_("  -R, --root CHROOT_DIR         directory to chroot into\n"), usageout);
+	(void) fputs (_("  -A, --prefix PREFIX_DIR       prefix directory where are located the /etc/* files\n"), usageout);
 	(void) fputs (_("  -s, --shell SHELL             login shell of the new account\n"), usageout);
 	(void) fputs (_("  -u, --uid UID                 user ID of the new account\n"), usageout);
 	(void) fputs (_("  -U, --user-group              create a group with the same name as the user\n"), usageout);
@@ -1053,8 +1055,10 @@ static void process_flags (int argc, char **argv)
 			{"no-user-group",  no_argument,       NULL, 'N'},
 			{"non-unique",     no_argument,       NULL, 'o'},
 			{"password",       required_argument, NULL, 'p'},
+			{"clear-password", required_argument, NULL, 'P'},
 			{"system",         no_argument,       NULL, 'r'},
 			{"root",           required_argument, NULL, 'R'},
+			{"prefix",         required_argument, NULL, 'A'},
 			{"shell",          required_argument, NULL, 's'},
 			{"uid",            required_argument, NULL, 'u'},
 			{"user-group",     no_argument,       NULL, 'U'},
@@ -1065,9 +1069,9 @@ static void process_flags (int argc, char **argv)
 		};
 		while ((c = getopt_long (argc, argv,
 #ifdef WITH_SELINUX
-		                         "b:c:d:De:f:g:G:hk:O:K:lmMNop:rR:s:u:UZ:",
+		                         "b:c:d:De:f:g:G:hk:K:lmMNop:P:rR:A:s:u:UZ:",
 #else				/* !WITH_SELINUX */
-		                         "b:c:d:De:f:g:G:hk:O:K:lmMNop:rR:s:u:U",
+		                         "b:c:d:De:f:g:G:hk:K:lmMNop:P:rR:A:s:u:U",
 #endif				/* !WITH_SELINUX */
 		                         long_options, NULL)) != -1) {
 			switch (c) {
@@ -1234,11 +1238,19 @@ static void process_flags (int argc, char **argv)
 				}
 				user_pass = optarg;
 				break;
+			case 'P': /* set clear text password */
+				user_pass = pw_encrypt (optarg, crypt_make_salt (NULL, NULL));
+				break;
 			case 'r':
 				rflg = true;
 				break;
 			case 'R': /* no-op, handled in process_root_flag () */
 				break;
+			case 'A': /* no-op, handled in process_prefix_flag () */
+				fprintf (stderr,
+					 _("%s: -A is deliberately not supported \n"),
+					 Prog);
+				exit (E_BAD_ARG);
 			case 's':
 				if (   ( !VALID (optarg) )
 				    || (   ('\0' != optarg[0])

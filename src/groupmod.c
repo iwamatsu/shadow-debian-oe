@@ -130,7 +130,9 @@ static void usage (int status)
 	(void) fputs (_("  -o, --non-unique              allow to use a duplicate (non-unique) GID\n"), usageout);
 	(void) fputs (_("  -p, --password PASSWORD       change the password to this (encrypted)\n"
 	                "                                PASSWORD\n"), usageout);
+	(void) fputs (_("  -P, --clear-password PASSWORD change the password to this clear PASSWORD\n"), usageout);
 	(void) fputs (_("  -R, --root CHROOT_DIR         directory to chroot into\n"), usageout);
+	(void) fputs (_("  -A, --prefix PREFIX_DIR       prefix directory where are located the /etc/* files\n"), usageout);
 	(void) fputs ("\n", usageout);
 	exit (status);
 }
@@ -378,10 +380,12 @@ static void process_flags (int argc, char **argv)
 		{"new-name",   required_argument, NULL, 'n'},
 		{"non-unique", no_argument,       NULL, 'o'},
 		{"password",   required_argument, NULL, 'p'},
+		{"clear-password", required_argument, NULL, 'P'},
 		{"root",       required_argument, NULL, 'R'},
+		{"prefix",     required_argument, NULL, 'A'},
 		{NULL, 0, NULL, '\0'}
 	};
-	while ((c = getopt_long (argc, argv, "g:hn:op:R:",
+	while ((c = getopt_long (argc, argv, "g:hn:op:P:R:A:",
 		                 long_options, NULL)) != -1) {
 		switch (c) {
 		case 'g':
@@ -408,8 +412,18 @@ static void process_flags (int argc, char **argv)
 			group_passwd = optarg;
 			pflg = true;
 			break;
+		case 'P':
+			group_passwd = pw_encrypt (optarg, crypt_make_salt (NULL, NULL));
+			pflg = true;
+			break;
 		case 'R': /* no-op, handled in process_root_flag () */
 			break;
+		case 'A': /* no-op, handled in process_prefix_flag () */
+			fprintf (stderr,
+				 _("%s: -A is deliberately not supported \n"),
+				 Prog);
+			exit (E_BAD_ARG);
+ 			break;
 		default:
 			usage (E_USAGE);
 		}

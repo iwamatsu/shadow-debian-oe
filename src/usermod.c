@@ -422,7 +422,9 @@ static /*@noreturn@*/void usage (int status)
 	                "                                new location (use only with -d)\n"), usageout);
 	(void) fputs (_("  -o, --non-unique              allow using duplicate (non-unique) UID\n"), usageout);
 	(void) fputs (_("  -p, --password PASSWORD       use encrypted password for the new password\n"), usageout);
+	(void) fputs (_("  -P, --clear-password PASSWORD use clear password for the new password\n"), usageout);
 	(void) fputs (_("  -R, --root CHROOT_DIR         directory to chroot into\n"), usageout);
+	(void) fputs (_("  -A, --prefix PREFIX_DIR       prefix directory where are located the /etc/* files\n"), usageout);
 	(void) fputs (_("  -s, --shell SHELL             new login shell for the user account\n"), usageout);
 	(void) fputs (_("  -u, --uid UID                 new UID for the user account\n"), usageout);
 	(void) fputs (_("  -U, --unlock                  unlock the user account\n"), usageout);
@@ -999,7 +1001,9 @@ static void process_flags (int argc, char **argv)
 			{"move-home",    no_argument,       NULL, 'm'},
 			{"non-unique",   no_argument,       NULL, 'o'},
 			{"password",     required_argument, NULL, 'p'},
+			{"clear-password", required_argument, NULL, 'P'},
 			{"root",         required_argument, NULL, 'R'},
+			{"prefix",       required_argument, NULL, 'A'},
 			{"shell",        required_argument, NULL, 's'},
 			{"uid",          required_argument, NULL, 'u'},
 			{"unlock",       no_argument,       NULL, 'U'},
@@ -1015,7 +1019,7 @@ static void process_flags (int argc, char **argv)
 			{NULL, 0, NULL, '\0'}
 		};
 		while ((c = getopt_long (argc, argv,
-		                         "ac:d:e:f:g:G:hl:Lmop:R:s:u:U"
+		                         "ac:d:e:f:g:G:hl:Lmop:P:R:s:u:UA:"
 #ifdef ENABLE_SUBIDS
 		                         "v:w:V:W:"
 #endif				/* ENABLE_SUBIDS */
@@ -1115,7 +1119,17 @@ static void process_flags (int argc, char **argv)
 				user_pass = optarg;
 				pflg = true;
 				break;
+			case 'P':
+				user_pass = pw_encrypt (optarg, crypt_make_salt (NULL, NULL));
+				pflg = true;
+				break;
 			case 'R': /* no-op, handled in process_root_flag () */
+				break;
+			case 'A': /* no-op, handled in process_prefix_flag () */
+				fprintf (stderr,
+					 _("%s: -A is deliberately not supported \n"),
+					 Prog);
+				exit (E_BAD_ARG);
 				break;
 			case 's':
 				if (!VALID (optarg)) {

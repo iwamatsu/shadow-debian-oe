@@ -124,8 +124,10 @@ static /*@noreturn@*/void usage (int status)
 	(void) fputs (_("  -o, --non-unique              allow to create groups with duplicate\n"
 	                "                                (non-unique) GID\n"), usageout);
 	(void) fputs (_("  -p, --password PASSWORD       use this encrypted password for the new group\n"), usageout);
+	(void) fputs (_("  -P, --clear-password PASSWORD use this clear password for the new group\n"), usageout);
 	(void) fputs (_("  -r, --system                  create a system account\n"), usageout);
 	(void) fputs (_("  -R, --root CHROOT_DIR         directory to chroot into\n"), usageout);
+	(void) fputs (_("  -A, --prefix PREFIX_DIR       directory prefix\n"), usageout);
 	(void) fputs ("\n", usageout);
 	exit (status);
 }
@@ -387,12 +389,14 @@ static void process_flags (int argc, char **argv)
 		{"key",        required_argument, NULL, 'K'},
 		{"non-unique", no_argument,       NULL, 'o'},
 		{"password",   required_argument, NULL, 'p'},
+		{"clear-password", required_argument, NULL, 'P'},
 		{"system",     no_argument,       NULL, 'r'},
 		{"root",       required_argument, NULL, 'R'},
+		{"prefix",     required_argument, NULL, 'A'},
 		{NULL, 0, NULL, '\0'}
 	};
 
-	while ((c = getopt_long (argc, argv, "fg:hK:op:rR:",
+	while ((c = getopt_long (argc, argv, "fg:hK:op:P:rR:A:",
 		                 long_options, NULL)) != -1) {
 		switch (c) {
 		case 'f':
@@ -444,10 +448,20 @@ static void process_flags (int argc, char **argv)
 			pflg = true;
 			group_passwd = optarg;
 			break;
+		case 'P':
+			pflg = true;
+			group_passwd = pw_encrypt (optarg, crypt_make_salt (NULL, NULL));
+			break;
 		case 'r':
 			rflg = true;
 			break;
 		case 'R': /* no-op, handled in process_root_flag () */
+			break;
+		case 'A': /* no-op, handled in process_prefix_flag () */
+			fprintf (stderr,
+				 _("%s: -A is deliberately not supported \n"),
+				 Prog);
+			exit (E_BAD_ARG);
 			break;
 		default:
 			usage (E_USAGE);
