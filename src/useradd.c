@@ -1953,6 +1953,35 @@ static void usr_update (void)
 }
 
 /*
+ * mkdir_p - create directories, including parent directories when needed
+ *
+ * similar to `mkdir -p'
+ */
+void mkdir_p(const char *path) {
+	int len = strlen(path);
+	char newdir[len + 1];
+	mode_t mode = 0755;
+	int i = 0;
+
+	if (path[i] == '\0') {
+		return;
+	}
+
+	/* skip the leading '/' */
+	i++;
+
+	while(path[i] != '\0') {
+		if (path[i] == '/') {
+			strncpy(newdir, path, i);
+			newdir[i] = '\0';
+			mkdir(newdir, mode);
+		}
+		i++;
+	}
+	mkdir(path, mode);
+}
+
+/*
  * create_home - create the user's home directory
  *
  *	create_home() creates the user's home directory if it does not
@@ -1970,42 +1999,39 @@ static void create_home (void)
 			fail_exit (E_HOMEDIR);
 		}
 #endif
-		/* XXX - create missing parent directories.  --marekm */
-		if (mkdir (user_home, 0) != 0) {
-			fprintf (stderr,
-			         _("%s: cannot create directory %s\n"),
-			         Prog, user_home);
-#ifdef WITH_AUDIT
-			audit_logger (AUDIT_ADD_USER, Prog,
-			              "adding home directory",
-			              user_name, (unsigned int) user_id,
-			              SHADOW_AUDIT_FAILURE);
-#endif
-			fail_exit (E_HOMEDIR);
-		}
-		chown (user_home, user_id, user_gid);
-		chmod (user_home,
-		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
-#ifdef WITH_ATTR
-	               attr_copy_file (def_template, user_home, NULL, NULL);
-#endif
-		home_added = true;
+		mkdir_p(user_home);
+	}
+	if (access (user_home, F_OK) != 0) {
 #ifdef WITH_AUDIT
 		audit_logger (AUDIT_ADD_USER, Prog,
-		              "adding home directory",
-		              user_name, (unsigned int) user_id,
-		              SHADOW_AUDIT_SUCCESS);
+			      "adding home directory",
+			      user_name, (unsigned int) user_id,
+			      SHADOW_AUDIT_FAILURE);
+#endif
+		fail_exit (E_HOMEDIR);
+	}
+	chown (user_home, user_id, user_gid);
+	chmod (user_home,
+	       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
+#ifdef WITH_ATTR
+        attr_copy_file (def_template, user_home, NULL, NULL);
+#endif
+	home_added = true;
+#ifdef WITH_AUDIT
+	audit_logger (AUDIT_ADD_USER, Prog,
+	              "adding home directory",
+	              user_name, (unsigned int) user_id,
+	              SHADOW_AUDIT_SUCCESS);
 #endif
 #ifdef WITH_SELINUX
-		/* Reset SELinux to create files with default contexts */
-		if (reset_selinux_file_context () != 0) {
-			fprintf (stderr,
-			         _("%s: cannot reset SELinux file creation context\n"),
-			         Prog);
-			fail_exit (E_HOMEDIR);
-		}
-#endif
+	/* Reset SELinux to create files with default contexts */
+	if (reset_selinux_file_context () != 0) {
+		fprintf (stderr,
+		         _("%s: cannot reset SELinux file creation context\n"),
+		         Prog);
+		fail_exit (E_HOMEDIR);
 	}
+#endif
 }
 
 /*
