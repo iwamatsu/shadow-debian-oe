@@ -1,0 +1,4 @@
+ignore: shadow-4.1.3-dots-in-usernames.patch
+already applied 0001-useradd-copy-extended-attributes-of-home.patch
+apply: shadow-update-pam-conf.patch
+ignore: shadow-relaxed-usernames.patch
