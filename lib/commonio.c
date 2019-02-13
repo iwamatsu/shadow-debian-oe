@@ -611,10 +611,18 @@ int commonio_open (struct commonio_db *db, int mode)
 	db->cursor = NULL;
 	db->changed = false;
 
-	fd = open (db->filename,
-	             (db->readonly ? O_RDONLY : O_RDWR)
-	           | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW);
-	saved_errno = errno;
+	if (db->readonly) {
+		fd = open (db->filename,
+			   (true ? O_RDONLY : O_RDWR)
+			   | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW);
+		saved_errno = errno;
+	} else {
+		fd = open (db->filename,
+			   (false ? O_RDONLY : O_RDWR)
+			   | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW);
+		saved_errno = errno;
+	}
+
 	db->fp = NULL;
 	if (fd >= 0) {
 #ifdef WITH_TCB
