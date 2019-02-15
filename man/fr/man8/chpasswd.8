@@ -1,0 +1,179 @@
+'\" t
+.\"     Title: chpasswd
+.\"    Author: Julianne Frances Haugh
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 27/07/2018
+.\"    Manual: Commandes de gestion du syst\(`eme
+.\"    Source: shadow-utils 4.5
+.\"  Language: French
+.\"
+.TH "CHPASSWD" "8" "27/07/2018" "shadow\-utils 4\&.5" "Commandes de gestion du syst\(`em"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+chpasswd \- Mettre \(`a jour des mots de passe par lot
+.SH "SYNOPSIS"
+.HP \w'\fBchpasswd\fR\ 'u
+\fBchpasswd\fR [\fIoptions\fR]
+.SH "DESCRIPTION"
+.PP
+La commande
+\fBchpasswd\fR
+lit une liste de paires de noms d\*(Aqutilisateurs et de mots de passe depuis l\*(Aqentr\('ee standard et utilise ces informations pour mettre \(`a jour un groupe d\*(Aqutilisateurs existants\&. Chaque ligne est au format suivant\ \&:
+.PP
+\fInom_utilisateur\fR:\fImot_de_passe\fR
+.PP
+Par d\('efaut, les mots de passe doivent \(^etre fournis en clair, et sont chiffr\('es par
+\fBchpasswd\fR\&. L\*(Aq\(^age du mot de passe sera \('egalement mis \(`a jour, s\*(Aqil est pr\('esent\&.
+.PP
+Par d\('efaut les mots de passe sont chiffr\('es par PAM, mais (m\(^eme si cela est d\('econseill\('e) vous pouvez s\('electionner une m\('ethode de chiffrement diff\('erente avec les options
+\fB\-e\fR,
+\fB\-m\fR
+ou
+\fB\-c\fR\&.
+.PP
+Except when PAM is used to encrypt the passwords,
+\fBchpasswd\fR
+first updates all the passwords in memory, and then commits all the changes to disk if no errors occurred for any user\&.
+.PP
+Quand PAM est utilis\('e pour chiffrer les mots de passe (et pour mettre \(`a jour les mots de passe dans la base de donn\('ees du syst\(`eme), si aucun mot de passe ne peut \(^etre mis \(`a jour,
+\fBchpasswd\fR
+continuera la mise \(`a jour des mots de passe pour les utilisateurs suivants, et renverra un code d\*(Aqerreur en sortie\&.
+.PP
+Cette commande est destin\('ee aux gros syst\(`emes pour lesquels un nombre importants de comptes sont cr\('e\('es en une seule fois\&.
+.SH "OPTIONS"
+.PP
+Les options disponibles pour la commande
+\fBchpasswd\fR
+sont\ \&:
+.PP
+\fB\-c\fR, \fB\-\-crypt\-method\fR\ \&\fIM\('ETHODE\fR
+.RS 4
+Utiliser la m\('ethode pr\('ecis\('ee pour chiffrer les mots de passe\&.
+.sp
+Les m\('ethodes disponibles sont DES, MD5, NONE et SHA256 ou SHA512 si votre libc prend en charge ces m\('ethodes\&.
+.sp
+Par d\('efaut, PAM est utilis\('e pour chiffrer les mots de passe\&.
+.RE
+.PP
+\fB\-e\fR, \fB\-\-encrypted\fR
+.RS 4
+Indiquer que les mots de passe fournis sont chiffr\('es\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Afficher un message d\*(Aqaide et quitter\&.
+.RE
+.PP
+\fB\-m\fR, \fB\-\-md5\fR
+.RS 4
+Permettre d\*(Aqutiliser le chiffrement MD5, plut\(^ot que DES, lorsque les mots de passe fournis ne sont pas chiffr\('es\&.
+.RE
+.PP
+\fB\-R\fR, \fB\-\-root\fR\ \&\fIR\('EP_CHROOT\fR
+.RS 4
+Appliquer les changements dans le r\('epertoire
+\fIR\('EP_CHROOT\fR
+et utiliser les fichiers de configuration du r\('epertoire
+\fIR\('EP_CHROOT\fR\&.
+.RE
+.PP
+\fB\-s\fR, \fB\-\-sha\-rounds\fR\ \&\fIROUNDS\fR
+.RS 4
+Utiliser le nombre de rounds pr\('ecis\('e pour chiffrer les mots de passe\&.
+.sp
+La valeur 0 signifie que le syst\(`eme choisira la valeur par d\('efaut du nombre de rounds pour la m\('ethode de chiffrement (5\ \&000)\&.
+.sp
+Une valeur minimale de 1\ \&000 et une valeur maximale de 999\ \&999\ \&999 seront impos\('ees\&.
+.sp
+Vous ne pouvez utiliser cette m\('ethode qu\*(Aqavec les m\('ethodes de chiffrement SHA256 ou SHA512\&.
+.sp
+Par d\('efaut, le nombre de rounds est d\('efini par les variables
+\fBSHA_CRYPT_MIN_ROUNDS\fR
+et
+\fBSHA_CRYPT_MAX_ROUNDS\fR
+dans
+/etc/login\&.defs\&.
+.RE
+.SH "AVERTISSEMENTS"
+.PP
+Pensez \(`a configurer les permissions ou umask afin d\*(Aqemp\(^echer la lecture des fichiers non chiffr\('es par les d\*(Aqautres utilisateurs\&.
+.SH "CONFIGURATION"
+.PP
+Les variables de configuration suivantes dans
+/etc/login\&.defs
+modifient le comportement de cet outil\ \&:
+.PP
+\fBSHA_CRYPT_MIN_ROUNDS\fR (nombre), \fBSHA_CRYPT_MAX_ROUNDS\fR (nombre)
+.RS 4
+Quand
+\fBENCRYPT_METHOD\fR
+est configur\('ee \(`a
+\fISHA256\fR
+ou
+\fISHA512\fR, cela d\('efinit le nombre de rounds de SHA utilis\('es par l\*(Aqalgorithme de chiffrement par d\('efaut (quand le nombre de rounds n\*(Aqest pas pr\('ecis\('e sur la ligne de commande)\&.
+.sp
+Avec beaucoup de rounds, il est plus difficile de trouver le mot de passe avec une attaque par force brute\&. Veuillez remarquer que plus de ressources processeur seront n\('ecessaires pour authentifier les utilisateurs\&.
+.sp
+Si non pr\('ecis\('ee, la libc utilisera le nombre de rounds par d\('efaut (5000)\&.
+.sp
+Les valeurs doivent \(^etre comprises dans l\*(Aqintervalle 1\ \&000\ \&\-\ \&999\ \&999\ \&999\&.
+.sp
+Si une seule des variables
+\fBSHA_CRYPT_MIN_ROUNDS\fR
+ou
+\fBSHA_CRYPT_MAX_ROUNDS\fR
+est configur\('ee, alors cette valeur sera utilis\('ee\&.
+.sp
+Si
+\fBSHA_CRYPT_MIN_ROUNDS\fR
+>
+\fBSHA_CRYPT_MAX_ROUNDS\fR, la valeur la plus \('elev\('ee sera utilis\('ee\&.
+.sp
+Remarque\ \&: cela n\*(Aqaffecte que la cr\('eation des mots de passe de groupe\&. La cr\('eation de mot de passe des utilisateurs est effectu\('ee par PAM en fonction de la configuration de PAM\&. Il est recommand\('e de d\('efinir cette variable en coh\('erence avec la configuration de PAM\&.
+.RE
+.SH "FICHIERS"
+.PP
+/etc/passwd
+.RS 4
+Informations sur les comptes des utilisateurs\&.
+.RE
+.PP
+/etc/shadow
+.RS 4
+Informations s\('ecuris\('ees sur les comptes utilisateurs\&.
+.RE
+.PP
+/etc/login\&.defs
+.RS 4
+Configuration de la suite des mots de passe cach\('es \(Fo\ \&shadow password\ \&\(Fc\&.
+.RE
+.PP
+/etc/pam\&.d/chpasswd
+.RS 4
+Configuration de PAM pour
+\fBchpasswd\fR\&.
+.RE
+.SH "VOIR AUSSI"
+.PP
+\fBpasswd\fR(1),
+\fBnewusers\fR(8),
+\fBlogin.defs\fR(5),\fBuseradd\fR(8)\&.

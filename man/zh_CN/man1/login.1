@@ -1,0 +1,327 @@
+'\" t
+.\"     Title: login
+.\"    Author: Julianne Frances Haugh
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 2018-07-27
+.\"    Manual: 用户命令
+.\"    Source: shadow-utils 4.5
+.\"  Language: Chinese Simplified
+.\"
+.TH "LOGIN" "1" "2018-07-27" "shadow\-utils 4\&.5" "用户命令"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "名称"
+login \- 在系统上启动回话
+.SH "大纲"
+.HP \w'\fBlogin\fR\ 'u
+\fBlogin\fR [\-p] [\-h\ \fI主机\fR] [\fI用户名\fR] [\fIENV=VAR\fR...]
+.HP \w'\fBlogin\fR\ 'u
+\fBlogin\fR [\-p] [\-h\ \fI主机\fR] \-f \fI用户名\fR
+.HP \w'\fBlogin\fR\ 'u
+\fBlogin\fR [\-p] \-r\ \fI主机\fR
+.SH "描述"
+.PP
+The
+\fBlogin\fR
+program is used to establish a new session with the system\&. It is normally invoked automatically by responding to the
+\fIlogin:\fR
+prompt on the user\*(Aqs terminal\&.
+\fBlogin\fR
+may be special to the shell and may not be invoked as a sub\-process\&. When called from a shell,
+\fBlogin\fR
+should be executed as
+\fBexec login\fR
+which will cause the user to exit from the current shell (and thus will prevent the new logged in user to return to the session of the caller)\&. Attempting to execute
+\fBlogin\fR
+from any shell but the login shell will produce an error message\&.
+.PP
+The user is then prompted for a password, where appropriate\&. Echoing is disabled to prevent revealing the password\&. Only a small number of password failures are permitted before
+\fBlogin\fR
+exits and the communications link is severed\&.
+.PP
+If password aging has been enabled for your account, you may be prompted for a new password before proceeding\&. You will be forced to provide your old password and the new password before continuing\&. Please refer to
+\fBpasswd\fR(1)
+for more information\&.
+.PP
+Your user and group ID will be set according to their values in the
+/etc/passwd
+file\&. The value for
+\fB$HOME\fR,
+\fB$SHELL\fR,
+\fB$PATH\fR,
+\fB$LOGNAME\fR, and
+\fB$MAIL\fR
+are set according to the appropriate fields in the password entry\&. Ulimit, umask and nice values may also be set according to entries in the GECOS field\&.
+.PP
+On some installations, the environmental variable
+\fB$TERM\fR
+will be initialized to the terminal type on your tty line, as specified in
+/etc/ttytype\&.
+.PP
+命令解释器的初始化脚本也可能执行。请参考手册中相应的章节来获取关于此功能的更多信息。
+.PP
+在登录 shell 中以第一个字符是\(lq*\(rq标注的是子系统登录。给定的主目录将被用于用户实际登录的新文件系统的根。
+.PP
+The
+\fBlogin\fR
+program is NOT responsible for removing users from the utmp file\&. It is the responsibility of
+\fBgetty\fR(8)
+and
+\fBinit\fR(8)
+to clean up apparent ownership of a terminal session\&. If you use
+\fBlogin\fR
+from the shell prompt without
+\fBexec\fR, the user you use will continue to appear to be logged in even after you log out of the "subsession"\&.
+.SH "选项"
+.PP
+\fB\-f\fR
+.RS 4
+不要执行认证，用户已经预认证过。
+.sp
+注意：此时，\fIusername\fR
+是强制的。
+.RE
+.PP
+\fB\-h\fR
+.RS 4
+此登录的远程主机名。
+.RE
+.PP
+\fB\-p\fR
+.RS 4
+保留环境。
+.RE
+.PP
+\fB\-r\fR
+.RS 4
+为 rlogin (远程登录)执行 autologin (自动登录)协议。
+.RE
+.PP
+\fB\-r\fR,
+\fB\-h\fR
+and
+\fB\-f\fR
+只能用于 root 使用
+\fBlogin\fR
+时。
+.SH "CAVEATS"
+.PP
+此版本的
+\fBlogin\fR
+有很多编译选项，只有一部分可以在任何站点使用。
+.PP
+文件的位置由系统配置决定。
+.PP
+The
+\fBlogin\fR
+program is NOT responsible for removing users from the utmp file\&. It is the responsibility of
+\fBgetty\fR(8)
+and
+\fBinit\fR(8)
+to clean up apparent ownership of a terminal session\&. If you use
+\fBlogin\fR
+from the shell prompt without
+\fBexec\fR, the user you use will continue to appear to be logged in even after you log out of the "subsession"\&.
+.PP
+As with any program,
+\fBlogin\fR\*(Aqs appearance can be faked\&. If non\-trusted users have physical access to a machine, an attacker could use this to obtain the password of the next person coming to sit in front of the machine\&. Under Linux, the SAK mechanism can be used by users to initiate a trusted path and prevent this kind of attack\&.
+.SH "配置文件"
+.PP
+在
+/etc/login\&.defs
+中有如下配置变量，可以用来更改此工具的行为：
+.PP
+\fBCONSOLE_GROUPS\fR (string)
+.RS 4
+在控制台登录时，添加到用户附加组集中的组列表(就如 CONSOLE 所确定的)。默认是无。
+使用时需要注意：这可能使用户获取这些组的永久权限，甚至登录到的不是此控制台时。
+.RE
+.PP
+\fBDEFAULT_HOME\fR (boolean)
+.RS 4
+如果不能 cd 到主目录时，说明是否允许登录。默认是否。
+.sp
+如果设置为
+\fIyes\fR，如果不能 cd 到主目录时，用户将会登录到根目录(/)。
+.RE
+.PP
+\fBENV_PATH\fR (string)
+.RS 4
+If set, it will be used to define the PATH environment variable when a regular user login\&. The value is a colon separated list of paths (for example
+\fI/bin:/usr/bin\fR) and can be preceded by
+\fIPATH=\fR\&. The default value is
+\fIPATH=/bin:/usr/bin\fR\&.
+.RE
+.PP
+\fBENV_SUPATH\fR (string)
+.RS 4
+If set, it will be used to define the PATH environment variable when the superuser login\&. The value is a colon separated list of paths (for example
+\fI/sbin:/bin:/usr/sbin:/usr/bin\fR) and can be preceded by
+\fIPATH=\fR\&. The default value is
+\fIPATH=/sbin:/bin:/usr/sbin:/usr/bin\fR\&.
+.RE
+.PP
+\fBERASECHAR\fR (number)
+.RS 4
+终端擦除字符 (\fI010\fR
+= backspace,
+\fI0177\fR
+= DEL)。
+.sp
+此值可以使用前缀\(lq0\(rq表示八进制，\(lq0x\(rq表示十六进制。
+.RE
+.PP
+\fBFAIL_DELAY\fR (number)
+.RS 4
+登录失败后，等待多少秒才再允许登录。
+.RE
+.PP
+\fBFAKE_SHELL\fR (string)
+.RS 4
+如果设置了，\fBlogin\fR
+将执行此 shell 而不是在
+/etc/passwd
+中指定的用户 shell。
+.RE
+.PP
+\fBHUSHLOGIN_FILE\fR (string)
+.RS 4
+If defined, this file can inhibit all the usual chatter during the login sequence\&. If a full pathname is specified, then hushed mode will be enabled if the user\*(Aqs name or shell are found in the file\&. If not a full pathname, then hushed mode will be enabled if the file exists in the user\*(Aqs home directory\&.
+.RE
+.PP
+\fBKILLCHAR\fR (number)
+.RS 4
+终端 KILL 字符 (\fI025\fR
+= CTRL/U)。
+.sp
+此值可以使用前缀\(lq0\(rq表示八进制，\(lq0x\(rq表示十六进制。
+.RE
+.PP
+\fBLOGIN_RETRIES\fR (number)
+.RS 4
+密码错误时，重试的最大次数。
+.sp
+This will most likely be overridden by PAM, since the default pam_unix module has its own built in of 3 retries\&. However, this is a safe fallback in case you are using an authentication module that does not enforce PAM_MAXTRIES\&.
+.RE
+.PP
+\fBLOGIN_TIMEOUT\fR (number)
+.RS 4
+最大登录时间(以秒为单位)。
+.RE
+.PP
+\fBLOG_OK_LOGINS\fR (boolean)
+.RS 4
+允许记录成功登录。
+.RE
+.PP
+\fBLOG_UNKFAIL_ENAB\fR (boolean)
+.RS 4
+在记录到登录失败时，允许记录未知用户名。
+.sp
+注意：如果用户不小心将密码输入到了登录名中，记录未知用户名可能是一个安全隐患。
+.RE
+.PP
+\fBTTYGROUP\fR (string), \fBTTYPERM\fR (string)
+.RS 4
+The terminal permissions: the login tty will be owned by the
+\fBTTYGROUP\fR
+group, and the permissions will be set to
+\fBTTYPERM\fR\&.
+.sp
+By default, the ownership of the terminal is set to the user\*(Aqs primary group and the permissions are set to
+\fI0600\fR\&.
+.sp
+\fBTTYGROUP\fR
+can be either the name of a group or a numeric group identifier\&.
+.sp
+If you have a
+\fBwrite\fR
+program which is "setgid" to a special group which owns the terminals, define TTYGROUP to the group number and TTYPERM to 0620\&. Otherwise leave TTYGROUP commented out and assign TTYPERM to either 622 or 600\&.
+.RE
+.PP
+\fBTTYTYPE_FILE\fR (string)
+.RS 4
+If defined, file which maps tty line to TERM environment parameter\&. Each line of the file is in a format something like "vt100 tty01"\&.
+.RE
+.PP
+\fBUSERGROUPS_ENAB\fR (boolean)
+.RS 4
+如果设置为
+\fIyes\fR，如果组中没有成员了，\fBuserdel\fR
+将移除此用户组，\fBuseradd\fR
+创建用户时，也会创建一个同名的默认组。
+.RE
+.SH "文件"
+.PP
+/var/run/utmp
+.RS 4
+当前登录会话的列表。
+.RE
+.PP
+/var/log/wtmp
+.RS 4
+先前的登录会话列表。
+.RE
+.PP
+/etc/passwd
+.RS 4
+用户账户信息。
+.RE
+.PP
+/etc/shadow
+.RS 4
+安全用户账户信息。
+.RE
+.PP
+/etc/motd
+.RS 4
+System message of the day file\&.
+.RE
+.PP
+/etc/nologin
+.RS 4
+阻止非 root 用户登录。
+.RE
+.PP
+/etc/ttytype
+.RS 4
+终端类型列表。
+.RE
+.PP
+$HOME/\&.hushlogin
+.RS 4
+阻止现实系统信息。
+.RE
+.PP
+/etc/login\&.defs
+.RS 4
+Shadow 密码套件配置。
+.RE
+.SH "参见"
+.PP
+\fBmail\fR(1),
+\fBpasswd\fR(1),
+\fBsh\fR(1),
+\fBsu\fR(1),
+\fBlogin.defs\fR(5),
+\fBnologin\fR(5),
+\fBpasswd\fR(5),
+\fBsecuretty\fR(5),
+\fBgetty\fR(8)\&.
