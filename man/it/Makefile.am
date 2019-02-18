@@ -44,10 +44,7 @@ man_MANS = \
 	man8/vigr.8 \
 	man8/vipw.8
 
-man_nopam = \
-	man5/limits.5 \
-	man5/login.access.5 \
-	man5/porttime.5
+man_nopam =
 
 if !USE_PAM
 man_MANS += $(man_nopam)
